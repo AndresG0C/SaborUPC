@@ -9,7 +9,7 @@ import {
 import microfrontendLayout from "./microfrontend-layout.html";
 
 // ------------------------------------------------------------------
-// 1. Utilidades: notificaciones (toasts) y resiliencia
+// 1. Utilidades: notificaciones (toasts)
 // ------------------------------------------------------------------
 function notificar(texto: string, tipo: string = "info") {
   const zona = document.getElementById("app-toasts");
@@ -28,14 +28,68 @@ function notificar(texto: string, tipo: string = "info") {
   }, 2500);
 }
 
-// Envuelve un MFE "casero" (expone window.renderX / window.unmountX) en el contrato
-// que single-spa espera: { bootstrap, mount, unmount }.
+// ------------------------------------------------------------------
+// 2. Resiliencia: mostrar mensaje + botón Reintentar
+// ------------------------------------------------------------------
+function mostrarErrorApp(nombre: string, err: any) {
+  console.error("[resiliencia] App caída:", nombre, err);
+
+  const main =
+    (document.querySelector("single-spa-router main") as HTMLElement) ||
+    (document.querySelector("main") as HTMLElement);
+  if (!main) return;
+
+  // Nombres bonitos para mostrar al usuario
+  const nombresBonitos: Record<string, string> = {
+    "@SaborUPC/catalogo": "Catálogo",
+    "@SaborUPC/carrito": "Carrito",
+    "@SaborUPC/perfil": "Perfil",
+    "@SaborUPC/pedidos": "Pedidos",
+  };
+  const etiqueta = nombresBonitos[nombre] || nombre;
+
+  // Contenedor específico para el error (no rompemos el resto del main)
+  let contenedorError = document.getElementById("mfe-error");
+  if (!contenedorError) {
+    contenedorError = document.createElement("div");
+    contenedorError.id = "mfe-error";
+    main.appendChild(contenedorError);
+  }
+
+  contenedorError.innerHTML =
+    '<div class="app-error">' +
+    "<p>El micro frontend <b>" +
+    etiqueta +
+    "</b> no está disponible en este momento. " +
+    "El resto de la aplicación sigue funcionando.</p>" +
+    '<button class="app-reintentar">Reintentar</button>' +
+    "</div>";
+
+  const boton = contenedorError.querySelector(
+    ".app-reintentar"
+  ) as HTMLButtonElement;
+  boton.addEventListener("click", () => {
+    // Recargar la página es lo más simple y suficiente para el taller.
+    // single-spa vuelve a intentar cargar el MFE desde cero.
+    window.location.reload();
+  });
+}
+
+// ------------------------------------------------------------------
+// 3. Envoltorios: adaptan los MFEs "caseros" al ciclo de vida de single-spa
+// ------------------------------------------------------------------
+
+// Envuelve un MFE que expone window.renderX / window.unmountX
 function envolverFuncion(renderFn: string, unmountFn: string) {
   const idInterno = "mfe-" + renderFn.toLowerCase();
 
   return {
     bootstrap: () => Promise.resolve(),
     mount: (props: any) => {
+      // Limpiar cualquier mensaje de error previo
+      const errDiv = document.getElementById("mfe-error");
+      if (errDiv) errDiv.remove();
+
       // Elegir host: domElement de single-spa, o el <main> del layout como fallback
       const host =
         props.domElement ||
@@ -70,19 +124,25 @@ function envolverFuncion(renderFn: string, unmountFn: string) {
   };
 }
 
-// Envuelve un MFE Web Component (etiqueta <mfe-x>) en el contrato de single-spa.
+// Envuelve un MFE Web Component (etiqueta <mfe-x>)
 function envolverWebComponent(tag: string) {
   const idInterno = "host-" + tag;
 
   return {
     bootstrap: () => Promise.resolve(),
     mount: (props: any) => {
+      // Limpiar cualquier mensaje de error previo
+      const errDiv = document.getElementById("mfe-error");
+      if (errDiv) errDiv.remove();
+
+      // Elegir host
       const host =
         props.domElement ||
         document.querySelector("single-spa-router main") ||
         document.querySelector("main") ||
         document.body;
 
+      // Crear (o reutilizar) el div host
       let div = document.getElementById(idInterno);
       if (!div) {
         div = document.createElement("div");
@@ -90,6 +150,7 @@ function envolverWebComponent(tag: string) {
         host.appendChild(div);
       }
 
+      // Insertar el Web Component
       const el = document.createElement(tag);
       div.appendChild(el);
       return Promise.resolve();
@@ -103,11 +164,23 @@ function envolverWebComponent(tag: string) {
 }
 
 // ------------------------------------------------------------------
-// 2. Carga de cada MFE: import + envoltorio según tipo
+// 4. Carga de cada MFE: import + envoltorio según tipo
 // ------------------------------------------------------------------
 async function loadApp({ name }: { name: string }) {
-  await import(/* webpackIgnore: true */ name);
+  // 1. Medir el tiempo de descarga del bundle
+  const t0 = performance.now();
 
+  try {
+    await import(/* webpackIgnore: true */ name);
+  } catch (e) {
+    mostrarErrorApp(name, e);
+    throw e;
+  }
+
+  const ms = (performance.now() - t0).toFixed(1);
+  console.info(`[mfe] ${name} cargó en ${ms} ms`);
+
+  // 2. Devolver el ciclo de vida que single-spa espera
   if (name === "@SaborUPC/catalogo") {
     return envolverFuncion("renderCatalogo", "unmountCatalogo");
   }
@@ -121,12 +194,11 @@ async function loadApp({ name }: { name: string }) {
     return envolverWebComponent("mfe-perfil");
   }
 
-  // Fallback: si algún MFE ya exporta bootstrap/mount/unmount, se usa tal cual
   return import(/* webpackIgnore: true */ name);
 }
 
 // ------------------------------------------------------------------
-// 3. Construcción del layout y registro
+// 5. Construcción del layout y registro
 // ------------------------------------------------------------------
 const routes = constructRoutes(microfrontendLayout);
 const applications = constructApplications({ routes, loadApp });
@@ -136,7 +208,7 @@ applications.forEach(registerApplication);
 layoutEngine.activate();
 
 // ------------------------------------------------------------------
-// 4. Eventos públicos que el contenedor escucha
+// 6. Eventos públicos que el contenedor escucha
 // ------------------------------------------------------------------
 window.addEventListener("carrito:actualizado", (e: any) => {
   const contador = document.getElementById("app-contador");
@@ -153,6 +225,6 @@ window.addEventListener("pedido:estado", (e: any) => {
 });
 
 // ------------------------------------------------------------------
-// 5. Arranque
+// 7. Arranque
 // ------------------------------------------------------------------
 start();
