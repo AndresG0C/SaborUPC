@@ -33,8 +33,8 @@
       "imports": {
         "@SaborUPC/root-config": "//localhost:9000/SaborUPC-root-config.js",
         "@SaborUPC/catalogo": "https://charming-maamoul-b29685.netlify.app/catalogo.js",
-        "@SaborUPC/carrito": "http://localhost:8083/carrito.js",
-        "@SaborUPC/perfil": "http://localhost:8084/perfil.js",
+        "@SaborUPC/carrito": "https://saborupc-mfe-carrito.vercel.app/carrito.js",
+        "@SaborUPC/perfil": "https://saborupc-mfe-perfil.vercel.app/perfil.js",
         "@SaborUPC/pedidos": "https://mfe-pedidos.onrender.com/pedidos.js"
       }
     }
@@ -60,7 +60,22 @@
   <noscript>
     You need to enable JavaScript to run this app.
   </noscript>
+
+  <header class="app-header">
+    <a href="#/catalogo" class="app-logo">SaborUPC</a>
+    <nav class="app-nav">
+      <a href="#/catalogo" data-ruta="/catalogo">Catálogo</a>
+      <a href="#/carrito" data-ruta="/carrito">Carrito <span id="app-contador" class="app-badge">0</span></a>
+      <a href="#/pedidos" data-ruta="/pedidos">Pedidos</a>
+      <a href="#/perfil" data-ruta="/perfil">Perfil</a>
+    </nav>
+    <span id="app-saludo" class="app-saludo">Hola, invitado</span>
+  </header>
+
   <div id="root"></div>
+
+  <div id="app-toasts" class="app-toasts" aria-live="polite"></div>
+
   <script>
     window.importMapInjector.initPromise.then(() => {
       import('@SaborUPC/root-config');

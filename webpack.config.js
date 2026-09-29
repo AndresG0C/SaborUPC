@@ -14,6 +14,7 @@ module.exports = (webpackConfigEnv, argv) => {
 
   return merge(defaultConfig, {
     devServer: {
+      historyApiFallback: true,
       client: {
         overlay: false,
       },

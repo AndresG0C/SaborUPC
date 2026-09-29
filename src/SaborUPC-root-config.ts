@@ -9,6 +9,29 @@ import {
 import microfrontendLayout from "./microfrontend-layout.html";
 
 // ------------------------------------------------------------------
+// 0. Estado del contenedor (persistente entre reconstrucciones del layout)
+// ------------------------------------------------------------------
+// single-spa-layout reconstruye el header cada vez que cambias de ruta,
+// así que hay que guardar estos valores y volver a pintarlos tras cada mount.
+let nombreUsuario: string = "invitado";
+let cantidadCarrito: number = 0;
+
+function actualizarSaludo() {
+  const saludo = document.getElementById("app-saludo");
+  if (saludo) saludo.textContent = "Hola, " + nombreUsuario;
+}
+
+function actualizarBadge() {
+  const contador = document.getElementById("app-contador");
+  if (contador) contador.textContent = String(cantidadCarrito);
+}
+
+function refrescarHeader() {
+  actualizarSaludo();
+  actualizarBadge();
+}
+
+// ------------------------------------------------------------------
 // 1. Utilidades: notificaciones (toasts)
 // ------------------------------------------------------------------
 function notificar(texto: string, tipo: string = "info") {
@@ -112,6 +135,8 @@ function envolverFuncion(renderFn: string, unmountFn: string) {
         console.error("[root-config] Falta la función", renderFn);
       }
 
+      refrescarHeader();
+
       return Promise.resolve();
     },
     unmount: (props: any) => {
@@ -153,6 +178,9 @@ function envolverWebComponent(tag: string) {
       // Insertar el Web Component
       const el = document.createElement(tag);
       div.appendChild(el);
+
+      refrescarHeader();
+
       return Promise.resolve();
     },
     unmount: (props: any) => {
@@ -211,13 +239,13 @@ layoutEngine.activate();
 // 6. Eventos públicos que el contenedor escucha
 // ------------------------------------------------------------------
 window.addEventListener("carrito:actualizado", (e: any) => {
-  const contador = document.getElementById("app-contador");
-  if (contador) contador.textContent = e.detail.cantidad;
+  cantidadCarrito = e.detail.cantidad;
+  actualizarBadge();
 });
 
 window.addEventListener("usuario:cambio", (e: any) => {
-  const saludo = document.getElementById("app-saludo");
-  if (saludo) saludo.textContent = "Hola, " + e.detail.nombre;
+  nombreUsuario = e.detail.nombre;
+  actualizarSaludo();
 });
 
 window.addEventListener("pedido:estado", (e: any) => {
