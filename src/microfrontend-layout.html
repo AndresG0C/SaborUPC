@@ -1,0 +1,36 @@
+<single-spa-router containerEl="#root" mode="hash">
+  <header class="app-header">
+    <a href="#/catalogo" class="app-logo">SaborUPC</a>
+    <nav class="app-nav">
+      <a href="#/catalogo" data-ruta="/catalogo">Catálogo</a>
+      <a href="#/carrito" data-ruta="/carrito"
+        >Carrito <span id="app-contador" class="app-badge">0</span></a
+      >
+      <a href="#/pedidos" data-ruta="/pedidos">Pedidos</a>
+      <a href="#/perfil" data-ruta="/perfil">Perfil</a>
+    </nav>
+    <span id="app-saludo" class="app-saludo">Hola, invitado</span>
+  </header>
+
+  <main>
+    <route default>
+      <application name="@SaborUPC/catalogo"></application>
+    </route>
+
+    <route path="carrito">
+      <application name="@SaborUPC/carrito"></application>
+    </route>
+
+    <route path="perfil">
+      <application name="@SaborUPC/perfil"></application>
+    </route>
+
+    <route path="pedidos">
+      <application name="@SaborUPC/pedidos"></application>
+    </route>
+  </main>
+
+  <div id="app-toasts" class="app-toasts" aria-live="polite"></div>
+
+  <footer class="app-footer">Contenedor v2.0 · single-spa</footer>
+</single-spa-router>

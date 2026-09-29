@@ -1,0 +1,152 @@
+/* Estilos globales del contenedor: solo layout y clases con prefijo app-.
+   Consume variables de design-tokens (http://localhost:8081/tokens.css). */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--fuente-base, Arial, Helvetica, sans-serif);
+  background: var(--color-fondo, #f4f6f8);
+  color: var(--color-texto, #222);
+}
+
+/* ---------- Header ---------- */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: var(--espaciado-4, 24px);
+  padding: 14px var(--espaciado-5, 32px);
+  background: var(--color-primario, #0b4f8a);
+  color: #fff;
+}
+.app-logo {
+  color: #fff;
+  font-size: var(--tam-titulo, 22px);
+  font-weight: bold;
+  text-decoration: none;
+}
+.app-nav {
+  display: flex;
+  gap: var(--espaciado-2, 8px);
+  flex: 1;
+}
+.app-nav a {
+  color: #dce9f5;
+  text-decoration: none;
+  padding: 6px 12px;
+  border-radius: var(--radio-sm, 4px);
+}
+.app-nav a.activo,
+.app-nav a:hover {
+  background: var(--color-primario-claro, #1283c8);
+  color: #fff;
+}
+.app-badge {
+  display: inline-block;
+  min-width: 22px;
+  padding: 1px 6px;
+  margin-left: 4px;
+  border-radius: 11px;
+  background: var(--color-acento, #f2c200);
+  color: var(--color-texto, #222);
+  font-size: var(--tam-pequeno, 12px);
+  font-weight: bold;
+  text-align: center;
+}
+.app-saludo {
+  font-size: 14px;
+  color: #dce9f5;
+}
+
+/* ---------- Raíz de montaje ---------- */
+#app-root {
+  max-width: 1000px;
+  margin: var(--espaciado-4, 24px) auto;
+  padding: 0 var(--espaciado-3, 16px);
+  min-height: 60vh;
+}
+
+.app-aviso {
+  color: var(--color-texto-suave, #666);
+}
+.app-error {
+  background: #fdecea;
+  color: var(--color-peligro, #a12a1e);
+  padding: var(--espaciado-3, 16px);
+  border-radius: var(--radio-sm, 4px);
+}
+
+/* ---------- Footer ---------- */
+.app-footer {
+  text-align: center;
+  font-size: var(--tam-pequeno, 12px);
+  color: var(--color-texto-suave, #777);
+  padding: var(--espaciado-3, 16px);
+}
+
+/* ---------- Toasts (notificaciones breves) ---------- */
+.app-toasts {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaciado-2, 8px);
+  z-index: 1000;
+  pointer-events: none; /* no bloquea clics al resto de la UI */
+}
+.app-toast {
+  background: var(--color-primario, #0b4f8a);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: var(--radio-md, 6px);
+  box-shadow: var(--sombra-toast, 0 4px 14px rgba(0, 0, 0, 0.18));
+  font-size: 14px;
+  max-width: 320px;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: auto;
+}
+.app-toast--visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+.app-toast--exito {
+  background: var(--color-exito, #1b7a3e);
+}
+.app-toast--info {
+  background: var(--color-primario, #0b4f8a);
+}
+.app-toast--error {
+  background: var(--color-peligro, #c0392b);
+}
+
+/* ---------- Botón de reintento (resiliencia) ---------- */
+.app-reintentar {
+  margin-top: var(--espaciado-3, 16px);
+  background: var(--color-peligro, #c0392b);
+  color: #fff;
+  border: 0;
+  padding: 8px 16px;
+  border-radius: var(--radio-sm, 4px);
+  cursor: pointer;
+  font-size: 14px;
+}
+.app-reintentar:hover {
+  background: #a12a1e;
+}
+
+/* Contenedores que single-spa-layout crea para cada aplicación */
+main {
+  min-height: 60vh;
+}
+
+main > div,
+main > [data-single-spa-application] {
+  max-width: 80%;
+  margin: var(--espaciado-4, 24px) auto;
+  padding: 0 var(--espaciado-3, 16px);
+}
