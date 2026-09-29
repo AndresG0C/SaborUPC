@@ -124,7 +124,7 @@ Cada uno vive en su propio origen:
 <script type="injector-importmap">
   {
     "imports": {
-      "@SaborUPC/root-config": "//localhost:9000/SaborUPC-root-config.js",
+      "@SaborUPC/root-config": "https://saborupc.vercel.app/SaborUPC-root-config.js",
       "@SaborUPC/catalogo": "https://charming-maamoul-b29685.netlify.app/catalogo.js",
       "@SaborUPC/carrito": "https://saborupc-mfe-carrito.vercel.app/carrito.js",
       "@SaborUPC/perfil": "https://saborupc-mfe-perfil.vercel.app/perfil.js",
