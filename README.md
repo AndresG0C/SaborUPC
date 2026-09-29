@@ -126,7 +126,7 @@ Cada uno vive en su propio origen:
     "imports": {
       "@SaborUPC/root-config": "//localhost:9000/SaborUPC-root-config.js",
       "@SaborUPC/catalogo": "https://charming-maamoul-b29685.netlify.app//catalogo.js",
-      "@SaborUPC/carrito": "https://<tu-carrito>.onrender.com/carrito.js",
+      "@SaborUPC/carrito": "https://saborupc-mfe-carrito.vercel.app//carrito.js",
       "@SaborUPC/perfil": "https://<tu-perfil>.onrender.com/perfil.js",
       "@SaborUPC/pedidos": "https://mfe-pedidos.onrender.com//pedidos.js"
     }
