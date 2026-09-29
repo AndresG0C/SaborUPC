@@ -252,6 +252,14 @@ window.addEventListener("pedido:estado", (e: any) => {
   notificar("Pedido #" + e.detail.pedidoId + ": " + e.detail.estado, "info");
 });
 
+// Precargar MFEs que solo escuchan eventos (aunque no estén visibles)
+import(/* webpackIgnore: true */ "@SaborUPC/carrito" as any).catch(
+  console.error
+);
+import(/* webpackIgnore: true */ "@SaborUPC/pedidos" as any).catch(
+  console.error
+);
+
 // ------------------------------------------------------------------
 // 7. Arranque
 // ------------------------------------------------------------------
