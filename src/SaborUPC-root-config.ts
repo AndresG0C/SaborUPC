@@ -260,6 +260,10 @@ import(/* webpackIgnore: true */ "@SaborUPC/pedidos" as any).catch(
   console.error
 );
 
+import(/* webpackIgnore: true */ "@SaborUPC/catalogo" as any).catch(
+  console.error
+);
+
 // ------------------------------------------------------------------
 // 7. Arranque
 // ------------------------------------------------------------------
